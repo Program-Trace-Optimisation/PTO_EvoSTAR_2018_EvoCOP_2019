@@ -7,6 +7,6 @@ This repository contains code implementing PTO in Python under `src`.
 A [draft paper](docs/paper_2018.pdf) describing the system is provided.
 
 Several tutorial-style Jupyter notebooks are available:
-* [src/analysis/onemax.ipynb]
-* [src/analysis/sphere.ipynb]
-* [src/analysis/TSP.ipynb]
+* [Onemax](src/analysis/onemax.ipynb)
+* [Sphere](src/analysis/sphere.ipynb)
+* [TSP](src/analysis/TSP.ipynb).
