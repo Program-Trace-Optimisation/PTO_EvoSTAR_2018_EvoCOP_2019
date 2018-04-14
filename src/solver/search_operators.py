@@ -44,12 +44,14 @@ class OPS:
 
     ##### COARSE OPERATORS #####
         
-    def mutate_ind(self, (pheno, geno)):
+    def mutate_ind(self, x):
+        pheno, geno = x
         mut_prob = 1.0/len(geno)
         offspring_geno = { addr : ((REP.factory(elem, self.fine_ops)).perturb(elem) if random.random() < mut_prob else elem) for addr, elem in geno.items() }
         return self.fix_ind(offspring_geno) # fix geno and get pheno
 
-    def crossover_ind(self, (pheno1, geno1), (pheno2, geno2)):
+    def crossover_ind(self, x1, x2):
+        (pheno1, geno1), (pheno2, geno2) = x1, x2
         offspring_geno = geno1.copy()
         offspring_geno.update({ addr : ((REP.factory(elem, self.fine_ops)).blend(elem, geno1[addr]) if addr in geno1 else elem) for addr, elem in geno2.items() })
         return self.fix_ind(offspring_geno) # fix geno and get pheno
@@ -72,8 +74,10 @@ class REP:
     """ Search Operators for the Trace Entry Representations """
 
     @staticmethod
-    def factory((f, args, output), fine_ops):
+    def factory(entry, fine_ops):
 
+        f, args, output = entry
+        
         if not fine_ops:
             return REP() # use generic coarse entry operations defined in REP
             
@@ -93,15 +97,18 @@ class REP:
         return REP() # fine ops not available, use coarse ops
 
 
-    def reset(self, (f, args, output)):
+    def reset(self, entry):
+        f, args, output = entry
         return (f, args, f(*args)) # resample (reset)
 
 
-    def perturb(self, (f, args, output)): # perturbs a single entry of the trace
+    def perturb(self, entry): # perturbs a single entry of the trace
+        f, args, output = entry
         return (f, args, f(*args)) # reset mutation
 
 
-    def blend(self, (f1, args1, output1), (f2, args2, output2)): # blends a single entry of the trace
+    def blend(self, entry1, entry2): # blends a single entry of the trace
+        (f1, args1, output1), (f2, args2, output2) = entry1, entry2
         return random.choice([(f1, args1, output1),(f2, args2, output2)])
 
 
@@ -121,8 +128,10 @@ class Real(REP):
     #    return (f, args, f(*args)) # resample (reset)
     
 
-    def perturb(self, (f, args, output)):
+    def perturb(self, entry):
 
+        f, args, output = entry
+        
         def creep(output):
             return output + (random.random() - 0.5)*(self.b-self.a)/10.0
 
@@ -134,7 +143,9 @@ class Real(REP):
         return (f, args, perturbed_output)
 
 
-    def blend(self, (f1, args1, output1), (f2, args2, output2)): # blends a single entry of the trace
+    def blend(self, entry1, entry2): # blends a single entry of the trace
+        
+        (f1, args1, output1), (f2, args2, output2) = entry1, entry2
 
         if (f1, args1) != (f2, args2):                                          # if incompatible parents, 
             return REP.blend(self, (f1, args1, output1), (f2, args2, output2))  # use coarse operator
@@ -185,7 +196,8 @@ class Cardinal(REP):
     #    return (f, args, f(*args)) # resample (reset)
     
 
-    def perturb(self, (f, args, output)):
+    def perturb(self, entry):
+        f, args, output = entry        
         if len(*args) == 1: # if len of input sequence is 1
             perturbed_output = output
         else:
@@ -216,7 +228,9 @@ class Ordinal(REP):
     #    return (f, args, f(*args)) # resample (reset)
     
 
-    def perturb(self, (f, args, output)):
+    def perturb(self, entry):
+        
+        f, args, output = entry
 
         def creep(output):
             return output + (1 if random.random() < 0.5 else -1)
@@ -229,8 +243,10 @@ class Ordinal(REP):
         return (f, args, perturbed_output)
 
 
-    def blend(self, (f1, args1, output1), (f2, args2, output2)): # blends a single entry of the trace
+    def blend(self, entry1, entry2): # blends a single entry of the trace
 
+        (f1, args1, output1), (f2, args2, output2) = entry1, entry2
+        
         if (f1, args1) != (f2, args2):                                          # if incompatible parents, 
             return REP.blend(self, (f1, args1, output1), (f2, args2, output2))  # use coarse operator
 
@@ -255,7 +271,8 @@ class Permutation(REP):
 
     # FIXME do we need to copy output, ie perturbed_output = output[:],
     # to avoid altering output itself?
-    def perturb(self, (f, args, output)):
+    def perturb(self, entry):
+        f, args, output = entry
         swap = random.sample(range(len(output)), 2)
         perturbed_output = output
         perturbed_output[swap[0]], perturbed_output[swap[1]] = perturbed_output[swap[1]], perturbed_output[swap[0]] # swap
