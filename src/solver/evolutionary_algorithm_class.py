@@ -9,7 +9,7 @@ class EA:
     def __init__(self, ops, budget):
         self.ops = ops
 
-	self.NUMBER_GENERATION = int(math.sqrt(budget))
+        self.NUMBER_GENERATION = int(math.sqrt(budget))
         self.POPULATION_SIZE = int(budget / self.NUMBER_GENERATION)
         self.TRUNCATION_RATE = 0.5
         # print("EA: GENO_SIZE = " + str(GENO_SIZE))
