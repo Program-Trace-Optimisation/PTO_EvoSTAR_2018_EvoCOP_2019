@@ -57,7 +57,7 @@ class OPS:
         return self.fix_ind(offspring_geno) # fix geno and get pheno
 
     def convex_combination_ind(self, mating_pool):
-        geno_pool = zip(*mating_pool)[1] # extract genotypes
+        geno_pool = list(zip(*mating_pool))[1] # extract genotypes
         offspring_keys = []
         for geno in geno_pool: # get all keys
             offspring_keys += geno.keys()

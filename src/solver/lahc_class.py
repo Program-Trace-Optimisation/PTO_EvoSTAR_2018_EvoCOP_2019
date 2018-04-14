@@ -46,7 +46,7 @@ Do until a chosen stopping condition
     def __init__(self, ops, budget, LFA=None):
         self.ops = ops
 
-	self.NUMBER_GENERATION = budget
+        self.NUMBER_GENERATION = budget
         self.data = []
         self.LFA = LFA
 

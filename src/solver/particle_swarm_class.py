@@ -9,7 +9,7 @@ class PS:
     def __init__(self, ops, budget):
         self.ops = ops
 
-	self.NUMBER_GENERATION = int(math.sqrt(budget))
+        self.NUMBER_GENERATION = int(math.sqrt(budget))
         self.POPULATION_SIZE = int(budget / self.NUMBER_GENERATION)
 
         self.data = []
