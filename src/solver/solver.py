@@ -50,22 +50,22 @@ def solve(randsol, fitness, solver=None, budget=None, effort=1.5, fine_ops=False
     #if solver == "RS":
 		
         #### import solver module 	
-	solver_module = __import__(solver_name[solver])
+        solver_module = __import__(solver_name[solver])
 
-	#### get solver class
+        #### get solver class
         Solver_Class = getattr(solver_module, solver) # assumes class name same as solver acronym
 
         #### create an instance of the solver
-	search_algorithm = Solver_Class(ops, budget)
+        search_algorithm = Solver_Class(ops, budget)
 	
-	#### run the solver
-	((pheno, _), found_fit) = search_algorithm.run()
+        #### run the solver
+        ((pheno, _), found_fit) = search_algorithm.run()
 	
-	#### collect data
-	solve.data = search_algorithm.data
+        #### collect data
+        solve.data = search_algorithm.data
     
-	#### return solution
-	return (pheno, found_fit)
+        #### return solution
+        return (pheno, found_fit)
 	
     else:
 	
