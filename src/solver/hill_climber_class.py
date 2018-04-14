@@ -8,7 +8,7 @@ class HC:
     def __init__(self, ops, budget):
         self.ops = ops
 
-	self.NUMBER_GENERATION = budget
+        self.NUMBER_GENERATION = budget
         self.data = []    
 
     def run(self):        
