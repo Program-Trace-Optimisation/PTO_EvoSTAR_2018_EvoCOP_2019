@@ -10,3 +10,5 @@ Several tutorial-style Jupyter notebooks are available:
 * [Onemax](src/problem/onemax.ipynb)
 * [Sphere](src/problem/sphere.ipynb)
 * [TSP](src/problem/TSP.ipynb).
+
+[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/Program-Trace-Optimisation/PTO/master)
