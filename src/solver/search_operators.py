@@ -7,7 +7,7 @@ class OPS:
     """ Search Operators for the Trace Representation """
 
     def __init__(self, randsol, fitness, fine_ops, tracer):
-	self.randsol = randsol
+        self.randsol = randsol
         self.fitness = fitness
         self.fine_ops = fine_ops
         self.tracer = tracer
