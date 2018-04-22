@@ -11,6 +11,11 @@ class Wrapper:
 		
     def __init__(self):
         self.tr = None ##### LINK TRACER TO WRAPPER
+
+    #def fix_generator(self, rs):
+    #    if not hasattr(rs, '__nonterminal__'):
+    #        rs = random_function(rs)
+    #    return lambda: rs()
  
     ##### WRAPPER FUNCTIONS
 
@@ -21,22 +26,36 @@ class Wrapper:
         # this wrapper creates or plays and fixes the trace
         def decorated_function1(*args):
 
+            ###############
+            # Tracing OFF #
+            ###############
+            
             if self.tr.mode == "off":
                 return f(*args) #return output
 
+
+            ##############
+            # Tracing ON #
+            ##############
+
             #terminal node: trace should not track functions called by this one
-            save_mode = self.tr.mode
-            self.tr.mode = "off"
+            save_mode, self.tr.mode = self.tr.mode, "off" # do we really need this?
 
             #get runtime name of current call
             addr = tuple(self.tr.stack)
 
+            # get current entry type
             entry_type = (f,args)
-
+            
             if save_mode == "trace":
                 output = f(*args) #sample
                 assert not addr in self.tr.trace #TRACE ADDRESS MUST BE UNIQUE
-                self.tr.trace[addr] = (entry_type,output) #add to trace
+                self.tr.trace[addr] = (entry_type,output) #add entry to trace
+
+
+            ############
+            # Playback #
+            ############
 
             if save_mode == "play":
                 if addr in self.tr.trace and entry_type == self.tr.trace[addr][0]:
@@ -45,8 +64,9 @@ class Wrapper:
                     output = f(*args) #sample
                 self.tr.new_trace[addr] = (entry_type,output) #fixed trace
 
+
             #restore mode
-            self.tr.mode = save_mode
+            self.tr.mode = save_mode # do we really need this?
 
             return output
 
@@ -64,7 +84,7 @@ class Wrapper:
         def decorated_function2(*args):
 
             #################
-            ### no naming ###
+            ### No naming ###
             #################
             
             #print("*", mode, str_addr)
@@ -76,10 +96,10 @@ class Wrapper:
 
 
             #####################
-            ### linear naming ###
+            ### Linear naming ###
             #####################
             
-            if not self.tr.str_addr:
+            if not self.tr.str_addr: 
 
                 #print("l")
 
@@ -99,51 +119,145 @@ class Wrapper:
 
 
             #########################
-            ### structured naming ###
+            ### Structured naming ###
             #########################
+
+            if False: 
             
-            # 'stack' tracks recursion, 'multiple' tracks looping
+                # 'stack' tracks recursion, 'multiple' tracks looping
 
-            # identify function in the program by its name and its line_no in the program
-            func_id = line_no, name  =  inspect.currentframe().f_back.f_lineno, func.__name__
+                # initialise multiple counts
+                if self.tr.multiple == []:
+                    self.tr.multiple = [defaultdict(int)]
 
-            # get recursion level
-            level = len(self.tr.stack)
+                # identify function in the program by its name and its line_no in the program
+                func_id = line_no, name  =  inspect.currentframe().f_back.f_lineno, func.__name__
 
-            # get number of repeated call to the function in a loop
-            if len(self.tr.multiple) < level+1: # it is level+1 because there can be loops at recursion level 0
-                self.tr.multiple.append(defaultdict(int)) #create new "multiple" stack level
+                # get recursion level
+                #level = len(self.tr.stack)
 
-            # no need of initialisation with default dictionary
-            #if not func_id in self.tr.multiple[level]:
-            #    self.tr.multiple[level][func_id] = 0 #initialise top element of "multiple" stack for a new function
+                # get number of repeated call to the function in a loop
+                #if len(self.tr.multiple) < level+1: # it is level+1 because there can be loops at recursion level 0
+                #    self.tr.multiple.append(defaultdict(int)) #create new "multiple" stack level
 
-            #print(level, multiple, func_id)
-            self.tr.multiple[level][func_id] += 1 #update top element of "multiple" stack
-            mult = self.tr.multiple[level][func_id]
+                # no need of initialisation with default dictionary
+                #if not func_id in self.tr.multiple[level]:
+                #    self.tr.multiple[level][func_id] = 0 #initialise top element of "multiple" stack for a new function
 
-            # identify a specific call to a function at the current recursion level
-            call_id = func_id + (mult, )
+                #print(level, multiple, func_id)
+                self.tr.multiple[-1][func_id] += 1 #update top element of "multiple" stack
+                mult = self.tr.multiple[-1][func_id]
 
-            # push call identifier on the stack
-            self.tr.stack.append(call_id)
-            #print(stack)
+                # identify a specific call to a function at the current recursion level
+                call_id = func_id + (mult, )
 
-            # get the output of funct
-            output = func(*args)
+                # push multiple
+                self.tr.multiple.append(defaultdict(int))
 
-            # pop call identifier from the stack
-            self.tr.stack.pop()
-            #print(stack)
+                # push call identifier on the stack
+                self.tr.stack.append(call_id)
+                #print(stack)
 
-            # delete all multiple below level
-            if len(self.tr.multiple) > level+1:
+                # get the output of funct
+                output = func(*args)
+
+                # pop call identifier from the stack
+                self.tr.stack.pop()
+                #print(stack)
+
+                # pop multiple
                 self.tr.multiple.pop()
-                #del self.tr.multiple[level+1] #pop "multiple" stack
 
-            return output
+                # delete all multiple below level
+                #if len(self.tr.multiple) > level+1:
+                #    self.tr.multiple.pop()
+                    #del self.tr.multiple[level+1] #pop "multiple" stack
 
-        decorated_function2.__name__ = func.__name__ # need this for compare_all: but is it ok elsewhere?
+                return output
+
+            ####################################
+            ### Structured naming with loops ###
+            ####################################
+
+            if False: 
+
+                # identify function in the program by:
+                name = func.__name__ # function name
+                line_no = inspect.currentframe().f_back.f_lineno # line number
+                idx = inspect.currentframe().f_back.f_lasti      # index in code (surrogate for column number)
+                loc_vars  = str({k: v for k, v in inspect.currentframe().f_back.f_locals.items() if k[0] == '_'}) # marked local vars
+                call_id = func_id = name, line_no, idx, loc_vars
+
+                # push call identifier on the stack
+                self.tr.stack.append(call_id)
+                #print(stack)
+
+                # get the output of funct
+                output = func(*args)
+
+                # pop call identifier from the stack
+                self.tr.stack.pop()
+                #print(stack)
+
+                return output
+
+            ##############################################
+            ### Resilient structured naming with loops ###
+            ##############################################
+
+            else:
+
+                # initialise multiple counts
+                if self.tr.multiple == []:
+                    self.tr.multiple = [defaultdict(int)]
+
+                # identify function in the program 
+                frame = inspect.currentframe().f_back
+
+                name = func.__name__ # function name
+                line_no = frame.f_lineno # line number
+                idx = frame.f_lasti      # index in code (surrogate for column number)
+
+                # local vars    
+                loc_vars = list(frame.f_locals.items())                     # local vars in the current frame
+                while(inspect.getframeinfo(frame).function[0] == '<'):      # find all local vars in the calling function scope
+                    frame = frame.f_back                                    # - move to outer frame
+                    loc_vars = loc_vars + list(frame.f_locals.items())      # - add local vars of outer frame
+                loc_vars  = str({k: v for k, v in loc_vars if k[0] == '_'}) # keep the marked local vars
+  
+                del frame
+                
+                func_id = name, line_no, idx, loc_vars
+
+                #print(level, multiple, func_id)
+                self.tr.multiple[-1][func_id] += 1 #update top element of "multiple" stack
+                mult = self.tr.multiple[-1][func_id]
+
+                # identify a specific call to a function at the current recursion level
+                call_id = func_id + (mult, )
+
+                # push multiple
+                self.tr.multiple.append(defaultdict(int))
+
+                # push call identifier on the stack
+                self.tr.stack.append(call_id)
+                #print(stack)
+
+                # get the output of funct
+                output = func(*args)
+
+                # pop call identifier from the stack
+                self.tr.stack.pop()
+                #print(stack)
+
+                # pop multiple
+                self.tr.multiple.pop()
+
+                return output
+
+                
+        decorated_function2.__name__ = func.__name__ 
+        decorated_function2.__nonterminal__ = True
         return decorated_function2
 
     ####
@@ -151,7 +265,10 @@ class Wrapper:
 # Create wrapper object
 
 wr = Wrapper()
-Tracer(wr) ## link a new tracer to the wrapper
+Tracer().acquire_wrapper(wr) ## link a new tracer to the wrapper
 
 make_traceable = wr.make_traceable
 random_function = wr.random_function
+
+
+
