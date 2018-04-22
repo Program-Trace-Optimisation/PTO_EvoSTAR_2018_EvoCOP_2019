@@ -4,7 +4,7 @@ import random, copy
     ##### GENERIC REPRESENTATION #####
 
 class REP:
-    """ Search Operators for the Trace Entry Representations """
+    """ Search Operators for Generic Trace Entry """
 
     def reset(self, entry):
         (f, args), _ = entry

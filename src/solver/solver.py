@@ -1,4 +1,5 @@
-######################### SOLVERS #########################
+
+######################### SOLVER #########################
 
 import math
 
@@ -7,6 +8,7 @@ from wrapper import wr
 from search_operators import OPS
 from AUTO_PARAM import avg_size_trace
 
+#FIX ME: get all solver names automatically 
 solver_name = {
 	"RS" : "ALG_RS_random_search",
 	"HC" : "ALG_HC_hill_climber",
@@ -16,14 +18,16 @@ solver_name = {
 }
 
 
-
 def solve(randsol, fitness, solver=None, budget=None, effort=1.5, fine_ops=False, str_trace=True):
 
 	##### PARAMETERS
 	
-	### create a tracer object associated with the wrapper and generator
-	tr = Tracer(wr, rs=randsol, tt=str_trace)
-		
+	### create a tracer object
+	tr = Tracer(rs=randsol, tt=str_trace) 
+
+	### associate wrapper and tracer
+	tr.acquire_wrapper(wr)
+	
 	### create an instance of the search operators
 	ops = OPS(fitness, fine_ops, tr)
 
@@ -70,4 +74,4 @@ def solve(randsol, fitness, solver=None, budget=None, effort=1.5, fine_ops=False
 ################################################################################
 
 
-        
+	

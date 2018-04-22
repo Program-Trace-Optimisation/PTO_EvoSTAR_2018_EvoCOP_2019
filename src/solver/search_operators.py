@@ -3,6 +3,10 @@ import random, copy
 
 from POLY_REP import POLY_REP
 
+#################### SEARCH OPERATORS #############################
+
+''' Define search operators for the trace representation with no reference to the representations of the trace entries '''
+
 Sol = namedtuple('Sol', ['pheno', 'geno'])
 
 class OPS:
@@ -13,7 +17,7 @@ class OPS:
         self.tracer = tracer
         self.rep = POLY_REP(fine_ops) # polymorphic representation
 
-    ##### COARSE OPERATORS (REPRESENTATION INDEPENDENT) #####
+    ##### COARSE OPERATORS (TRACE REPRESENTATION INDEPENDENT) #####
 
     def create_ind(self):
         return Sol._make(self.tracer.get_trace())

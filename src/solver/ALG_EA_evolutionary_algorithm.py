@@ -3,6 +3,9 @@ import math
 
 ######################### EVOLUTIONARY ALGORITHM #########################
 
+''' Define a generic Evolutionary Algoithm with no reference to the solution representation '''
+
+
 class EA:
     """ Evolutionary Algorithm Class """
 
