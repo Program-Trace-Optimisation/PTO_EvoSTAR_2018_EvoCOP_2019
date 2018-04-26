@@ -212,22 +212,40 @@ class Wrapper:
                     self.tr.multiple = [defaultdict(int)]
 
                 # identify function in the program 
-                frame = inspect.currentframe().f_back
+                frame = inspect.currentframe().f_back 
 
-                name = func.__name__ # function name
+                name = func.__name__     # function name
                 line_no = frame.f_lineno # line number
                 idx = frame.f_lasti      # index in code (surrogate for column number)
 
                 # local vars    
                 loc_vars = list(frame.f_locals.items())                     # local vars in the current frame
-                while(inspect.getframeinfo(frame).function[0] == '<'):      # find all local vars in the calling function scope
+                while(frame.f_code.co_name[0] == '<'):                      # find all local vars in the calling function scope
+                    #print(frame.f_code.co_name)
                     frame = frame.f_back                                    # - move to outer frame
                     loc_vars = loc_vars + list(frame.f_locals.items())      # - add local vars of outer frame
-                loc_vars  = str({k: v for k, v in loc_vars if k[0] == '_'}) # keep the marked local vars
+
+                loc_vars_str  = str({k: v for k, v in loc_vars if k[0] == '_'}) # keep the marked local vars
   
                 del frame
+
+                '''
+                stack = inspect.getouterframes(inspect.currentframe(), context=1)
+
+                name = func.__name__            # function name
+                line_no = stack[0].frame.f_lineno # line number
+                idx = stack[0].frame.f_lasti    # index in code (surrogate for column number)
+
+                loc_vars = []
+                for stack_entry in stack:
+                    loc_vars = loc_vars + list(stack_entry.frame.f_locals.items())
+                    if stack_entry.function[0] == '<': break
+                loc_vars  = str({k: v for k, v in loc_vars if k[0] == '_'})
+
+                del stack
+                '''
                 
-                func_id = name, line_no, idx, loc_vars
+                func_id = name, line_no, idx, loc_vars_str
 
                 #print(level, multiple, func_id)
                 self.tr.multiple[-1][func_id] += 1 #update top element of "multiple" stack
