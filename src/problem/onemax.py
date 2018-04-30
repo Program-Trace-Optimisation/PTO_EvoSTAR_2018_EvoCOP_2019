@@ -1,6 +1,6 @@
 #from __future__ import print_function
 
-from PTO import random, random_function, solve, compare_methods #, compare_scalability
+from PTO import random, solve, compare_methods #, compare_scalability #random_function
 
 
 ##### ONE MAX #####
@@ -10,7 +10,7 @@ from PTO import random, random_function, solve, compare_methods #, compare_scala
 
 n=30
 
-@random_function
+#@random_function
 def randsol1(problem_size=n):
     #return random.sample([0,1,2,3],4) 
     #return [random.choice([0,1]) for x in range(problem_size)]
