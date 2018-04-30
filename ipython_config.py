@@ -1,3 +1,6 @@
+# Configuration file for ipython.
+
+c = get_config()
 
 ############ This file should be put in  C:\Users\alberto\.ipython\profile_default
 
@@ -183,4 +186,3 @@ ast_transformers = [Import(), RandFuncDec(), CompVar(), LoopVar(), WhileVar()]
 
 
 c.InteractiveShell.ast_transformers = ast_transformers 
-
