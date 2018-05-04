@@ -1,0 +1,5 @@
+<expr> ::= <op>(<expr>, <expr>) | <var> | <const>
+<op> ::= add | sub | mul | aq
+<var> ::= x[<varidx>]
+<varidx> ::= GE_RANGE:n_vars
+<const> ::= 0.0 | 0.1 | 0.2 | 0.3 | 0.4 | 0.5 | 0.6 | 0.7 | 0.8 | 0.9 | 1.0

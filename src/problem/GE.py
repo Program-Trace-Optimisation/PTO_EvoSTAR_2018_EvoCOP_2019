@@ -36,6 +36,21 @@ def GE_randsol(gram):
     f.func_name = s
     return f
 
+@random_function # essential    
+def random_str(grammar, s=None):
+    """Recursively derive a random string given a grammar. Don't create a
+    derivation tree."""
+    if s is None:
+        s = grammar.start_rule[0]
+    elif s in grammar.terminals:
+        return s
+    rule = grammar.rules[s]
+    if len(rule) > 1:
+        prod = random.choice(rule)
+    else:
+        prod = rule[0]
+    return "".join([random_str(grammar, s[0]) for s in prod])
+
 # Our grammar is implemented as an "executable" below, but is equivalent
 # to the following BNF:
 """    
@@ -90,7 +105,7 @@ def fitness_sr_data(X, y):
 def fitness_sr(target, train_X="random"):
     # random fitness cases in the [-1, 1] hypercube
     if type(train_X) == str and train_X == "random":
-        train_X = [tuple([2*(noise.random() - 0.5) for j in range(target.nvars)]) for i in range(20)]
+        train_X = [tuple([2*(noise.random() - 0.5) for j in range(target.n_vars)]) for i in range(20)]
     train_y = target(train_X)
 
     ones = np.ones_like(train_y)
@@ -135,17 +150,19 @@ np.random.seed(seed)
 
 if problem.startswith("poly_"):
     import polynomial
-    deg, nvars = map(int, problem.split("_")[1:])
-    coefs = [2*(noise.random() - 0.5) for i in polynomial.Polynomial.terms(deg, nvars)]
-    p = polynomial.Polynomial(deg, nvars, coefs)
+    deg, n_vars = map(int, problem.split("_")[1:])
+    coefs = [2*(noise.random() - 0.5) for i in polynomial.Polynomial.terms(deg, n_vars)]
+    p = polynomial.Polynomial(deg, n_vars, coefs)
     nrows = 20
-    X = np.random.random((nvars, nrows))
-    fitness = fitness_sr(lambda x: p.eval(x), train_X=X)
+    train_X = np.random.random((n_vars, nrows))
+    fitness = fitness_sr(lambda x: p.eval(x), train_X=train_X)
+    test_fitness_fn = fitness # no separate training set
 else:
     train_X, train_y = read_data(os.path.join("datasets", problem, "Train.txt"))
     test_X, test_y = read_data(os.path.join("datasets", problem, "Test.txt"))
     n_vars = train_X.shape[0]
     fitness = fitness_sr_data(train_X, train_y)
+    test_fitness_fn = fitness_sr_data(test_X, test_y)
 
 # Special case when randsol is GE_randsol_sr_nobnf: there is no .bnf file
 if sys.argv[4].endswith("nobnf"):
@@ -157,11 +174,10 @@ else:
 
 fn, obj = solve(_randsol, fitness, solver=search_algo, str_trace=str_trace, budget=budget)
 
-test_fitness_fn = fitness_sr_data(test_X, test_y)
 test_obj = test_fitness_fn(fn)
 
 item = (problem, gram_file, search_algo, randsol.__name__, str_trace, budget, seed, obj, test_obj, fn.__name__)
 ofilename = "%s_%s_%s_%s_%d_%d_%d.dat" % item[:-3]
 ofilename = ofilename.replace("/", "_") # in case user has passed in a dirname
 ofilename = os.path.join("GE_results", ofilename)
-file(ofilename, "w").write("%s\t%s\t%s\t%s\t%d\t%d\t%d\t%f\t%f\t%s\n" % item)
+open(ofilename, "w").write("%s\t%s\t%s\t%s\t%d\t%d\t%d\t%f\t%f\t%s\n" % item)
