@@ -24,14 +24,14 @@ class Wrapper:
     def make_traceable(self, f):
 
         # this wrapper creates or plays and fixes the trace
-        def decorated_function1(*args):
+        def decorated_function1(*args, **kwds):
 
             ###############
             # Tracing OFF #
             ###############
             
             if self.tr.mode == "off":
-                return f(*args) #return output
+                return f(*args, **kwds) #return output
 
 
             ##############
@@ -45,10 +45,10 @@ class Wrapper:
             addr = tuple(self.tr.stack)
 
             # get current entry type
-            entry_type = (f,args)
+            entry_type = (f,args) # FIXME: if using random generator with key-word args this should be (f,args,kwds)
             
             if save_mode == "trace":
-                output = f(*args) #sample
+                output = f(*args, **kwds) #sample
                 assert not addr in self.tr.trace #TRACE ADDRESS MUST BE UNIQUE
                 self.tr.trace[addr] = (entry_type,output) #add entry to trace
 
@@ -61,7 +61,7 @@ class Wrapper:
                 if addr in self.tr.trace and entry_type == self.tr.trace[addr][0]:
                     output = self.tr.trace[addr][1] #use value from trace
                 else: # if not existing or mismatch
-                    output = f(*args) #sample
+                    output = f(*args, **kwds) #sample
                 self.tr.new_trace[addr] = (entry_type,output) #fixed trace
 
 
@@ -81,7 +81,7 @@ class Wrapper:
     def random_function(self, func):
 
         # this wrapper keeps track of the "runtime name"
-        def decorated_function2(*args):
+        def decorated_function2(*args, **kwds):
 
             #################
             ### No naming ###
@@ -90,7 +90,7 @@ class Wrapper:
             #print("*", mode, str_addr)
 
             if self.tr.mode == "off":
-                return func(*args) #return output
+                return func(*args, **kwds) #return output
 
             #print("r")
 
@@ -115,7 +115,7 @@ class Wrapper:
                     count = self.tr.stack[0][2]
                     self.tr.stack = [(None, None, count+1)]
 
-                return func(*args) #return output
+                return func(*args, **kwds) #return output
 
 
             #########################
@@ -159,7 +159,7 @@ class Wrapper:
                 #print(stack)
 
                 # get the output of funct
-                output = func(*args)
+                output = func(*args, **kwds)
 
                 # pop call identifier from the stack
                 self.tr.stack.pop()
@@ -193,7 +193,7 @@ class Wrapper:
                 #print(stack)
 
                 # get the output of funct
-                output = func(*args)
+                output = func(*args, **kwds)
 
                 # pop call identifier from the stack
                 self.tr.stack.pop()
@@ -262,7 +262,7 @@ class Wrapper:
                 #print(stack)
 
                 # get the output of funct
-                output = func(*args)
+                output = func(*args, **kwds)
 
                 # pop call identifier from the stack
                 self.tr.stack.pop()
