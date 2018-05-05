@@ -190,7 +190,7 @@ def load_ipython_extension(ipython):
     instance. We can register the magic with the
     `register_magic_function` method of the shell
     instance."""
-    ipython.exec_lines = ['from _PTO import random_function']
+    ipython.ex('from _PTO import random_function')
     ipython.ast_transformers = ast_transformers
 
 
