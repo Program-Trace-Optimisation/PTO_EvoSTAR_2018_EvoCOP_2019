@@ -36,7 +36,7 @@ def GE_randsol(gram):
     f.func_name = s
     return f
 
-@random_function # essential    
+#@random_function # essential    
 def random_str(grammar, s=None):
     """Recursively derive a random string given a grammar. Don't create a
     derivation tree."""
@@ -69,19 +69,19 @@ def GE_randsol_sr_nobnf():
     
 RC = random.choice
 
-@random_function
+#@random_function
 def Expr(): return RC([Op_Expr_Expr, Var, Const])()
 
-@random_function
+#@random_function
 def Op_Expr_Expr(): return Op() + "(" + Expr() + ", " + Expr() + ")"
 
-@random_function
+#@random_function
 def Op(): return RC(["add", "sub", "mul", "aq"])
 
-@random_function
+#@random_function
 def Var(): return "x[" + str(random.randrange(n_vars)) + "]"
 
-@random_function
+#@random_function
 def Const(): return RC(["0.0", "0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7", "0.8", "0.9", "1.0"])
 
 
