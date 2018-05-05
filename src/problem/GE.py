@@ -179,5 +179,7 @@ test_obj = test_fitness_fn(fn)
 item = (problem, gram_file, search_algo, randsol.__name__, str_trace, budget, seed, obj, test_obj, fn.__name__)
 ofilename = "%s_%s_%s_%s_%d_%d_%d.dat" % item[:-3]
 ofilename = ofilename.replace("/", "_") # in case user has passed in a dirname
-ofilename = os.path.join("GE_results", ofilename)
+odirname = "GE_results"
+ofilename = os.path.join(odirname, ofilename)
+os.makedirs(odirname, exist_ok=True) # ensure dir exists
 open(ofilename, "w").write("%s\t%s\t%s\t%s\t%d\t%d\t%d\t%f\t%f\t%s\n" % item)
