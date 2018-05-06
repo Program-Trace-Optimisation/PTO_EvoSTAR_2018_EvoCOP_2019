@@ -5,12 +5,13 @@ import ast
 
 ##### 1) IMPORT
 
+# import PTO_ENV ---> from PTO import random_function
+
 class Import(ast.NodeTransformer):
 
-    def visit_ImportFrom(self, node):
-        if node.module == 'PTO':
-            node.module = '_PTO'
-            node.names = node.names + [ast.alias(name='random_function', asname=None)]
+    def visit_Import(self, node):
+        if node.names[0].name == 'PTO_ENV':
+            node = ast.ImportFrom(module='PTO', names=[ast.alias(name='random_function', asname=None)], level=0)
         return node
 
 
