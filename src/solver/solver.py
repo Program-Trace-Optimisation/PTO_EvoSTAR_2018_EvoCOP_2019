@@ -18,7 +18,7 @@ solver_name = {
 }
 
 
-def solve(randsol, fitness, solver=None, budget=None, effort=1.5, fine_ops=False, str_trace=True):
+def solve(randsol, fitness, solver=None, budget=None, effort=1.5, fine_ops=True, str_trace=True):
 
 	##### PARAMETERS
 	
