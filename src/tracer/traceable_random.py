@@ -18,15 +18,21 @@ setattr(random, 'random', random_function(make_traceable(random.random)))
 # semantics for shuffle so user can continue to use shuffle in-place
 # as usual, but tracer gets a return value in the trace (instead of
 # None)
+
+##### FIXME: this degenerates to random search as the address (entry name) and the output are coupled
+##### and changing the output changes also the address, so forcing resampling
+
+#random_shuffle_saved = random.shuffle
+#def shuffle(x):
+#    random_shuffle_saved(x)
+#    return x
+#setattr(random, 'shuffle', random_function(make_traceable(shuffle)))
+
+#### FIX: we do not allow in-place calls!
+
 random_shuffle_saved = random.shuffle
 def shuffle(x):
-    random_shuffle_saved(x)
-    return x
+    y = x[:]
+    random_shuffle_saved(y)
+    return y
 setattr(random, 'shuffle', random_function(make_traceable(shuffle)))
-
-
-
-
-
-
-
