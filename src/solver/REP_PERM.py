@@ -31,6 +31,42 @@ class PERM(REP):
         return (typ, perturbed_output)
        
     
-    #FIXME: add PMX    
+    def blend(self, entry1, entry2):
+        return self.PMX(entry1, entry2)
+    
+
+    def PMX(self, entry1, entry2):
+        
+        (typ, output1), (_, output2) = entry1, entry2
+
+        combined_output = output1[:]
+        
+        size = min(len(output1), len(output2))
+        p1, p2 = [0]*size, [0]*size
+
+        # Initialize the position of each indices in the individuals
+        for i in range(size):
+            p1[output1[i]] = i
+            p2[output2[i]] = i
+        # Choose crossover points
+        cxpoint1 = random.randint(0, size)
+        cxpoint2 = random.randint(0, size - 1)
+        if cxpoint2 >= cxpoint1:
+            cxpoint2 += 1
+        else: # Swap the two cx points
+            cxpoint1, cxpoint2 = cxpoint2, cxpoint1
+
+        # Apply crossover between cx points
+        for i in range(cxpoint1, cxpoint2):
+            # Keep track of the selected values
+            temp1 = output1[i]
+            temp2 = output2[i]
+            # Swap the matched value
+            combined_output[i], combined_output[p1[temp2]] = temp2, temp1
+            # Position bookkeeping
+            p1[temp1], p1[temp2] = p1[temp2], p1[temp1]
+            p2[temp1], p2[temp2] = p2[temp2], p2[temp1]
+
+        return (typ, combined_output)       
 
     #FIXME: add mutiparent sorting crossover
