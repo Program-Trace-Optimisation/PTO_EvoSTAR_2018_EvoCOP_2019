@@ -32,7 +32,10 @@ class OPS:
     ##### COARSE OPERATORS #####
         
     def mutate_ind(self, sol):
-        mut_prob = 1.0/len(sol.geno)
+        try:
+            mut_prob = 1.0/len(sol.geno)
+        except ZeroDivisionError:
+            raise ZeroDivisionError("Genome of length 0. Did you forget to trace a random call in the generator?")
         offspring_geno = { addr : (self.rep.perturb(elem) if random.random() < mut_prob else elem) for addr, elem in sol.geno.items() }
         return self.fix_ind(offspring_geno) # fix geno and get pheno
 
