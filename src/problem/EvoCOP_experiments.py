@@ -4,6 +4,8 @@ import GRASP_ORDERING, GRASP_KNAPSACK, GRASP_JSSP, GRASP_TSP
 
 import sys, math, time
 
+import random as noise
+
 
 """
 
@@ -66,6 +68,7 @@ def triangular(features, costs, solution, alpha):
 #     features.sort(key=lambda feature: costs[feature], reverse=True) # FIXME consider quick-select
 #     return features[idx]
 
+    
 
 problems = [GRASP_ORDERING, GRASP_JSSP, GRASP_KNAPSACK, GRASP_TSP]
 # problems = [GRASP_KNAPSACK]
@@ -75,7 +78,8 @@ alpha_vals = [0.0, 0.5, 1.0]
 solvers = ["RS", "HC", "EA"]
 # solvers = ["HC"]
 str_trace_vals = [False, True]
-patch_vals = [False] # we'll have to hardcode this for now: run EvoCOP_experiments.py twice, once with wrapper.py and once with wrapper_patch.py. Set this val here for bookkeeping
+patch_vals = [False] # cp ../tracer/wrapper_nopatch.py ../tracer/wrapper.py
+patch_vals = [True]  # cp ../tracer/wrapper_patch.py ../tracer/wrapper.py
 budget = 5
 start_rep, end_rep = int(sys.argv[1]), int(sys.argv[2])
 
@@ -94,15 +98,17 @@ for problem in problems:
         allowed_features = problem.allowed_features
         cost_feature = problem.cost_feature
         add_feature = problem.add_feature
-        # for patch in [True, False]:
         for choose_feature in distributions:
             for alpha in alpha_vals:
                 for solver in solvers:
                     for patch in patch_vals:
                         for str_trace in str_trace_vals:
                             for rep in range(start_rep, end_rep):
+                                random.seed(rep)
+                                noise.seed(rep)
                                 start_time = time.time()
+                                print(problem.__name__, instance["name"], instance["n"], choose_feature.__name__, alpha, solver, patch, str_trace, rep)
                                 ind, fit = solve(GRASP_randsol, fitness, solver=solver, str_trace=str_trace, budget=budget)
                                 end_time = time.time()
                                 elapsed_time = end_time - start_time
-                                print(problem.__name__, instance["name"], instance["n"], choose_feature.__name__, alpha, solver, str_trace, rep, start_time, elapsed_time, fit, str(ind))
+                                print(problem.__name__, instance["name"], instance["n"], choose_feature.__name__, alpha, solver, patch, str_trace, rep, start_time, elapsed_time, fit, str(ind))
