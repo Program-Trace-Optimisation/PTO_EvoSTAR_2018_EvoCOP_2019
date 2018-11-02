@@ -34,10 +34,10 @@ problems" (Juan et al., p. 121).
 def GRASP_randsol():
     solution = empty_solution()
     while(not complete(solution)):
-      features = allowed_features(solution)
-      costs = {feat:cost_feature(solution, feat) for feat in features}
-      selected_feature = choose_feature(features, costs, solution, alpha) # only source of randomness
-      solution = add_feature(solution, selected_feature)
+        features = allowed_features(solution)
+        costs = {feat:cost_feature(solution, feat) for feat in features}
+        selected_feature = choose_feature(features, costs, solution, alpha) # only source of randomness
+        solution = add_feature(solution, selected_feature)
     return solution
 
 def step_uniform(features, costs, solution, alpha):
@@ -52,9 +52,8 @@ def triangular(features, costs, solution, alpha):
     n = len(features)
     r = random.triangular(0, alpha * n, 0) # LB, UB, mode
     idx = int(r)
-    # print("alpha, n, r, idx", alpha, n, r, idx)
     if idx >= n: # very rare, the equivalent of sampling 1.0 from a uniform on [0.0, 1.0]
-      idx -= 1   # it would choose an invalid feature, so we hack it.
+        idx -= 1   # it would choose an invalid feature, so we hack it.
     features.sort(key=lambda feature: costs[feature], reverse=True) # FIXME consider quick-select
     return features[idx]
 
@@ -73,11 +72,11 @@ def triangular(features, costs, solution, alpha):
 problems = [GRASP_ORDERING, GRASP_JSSP, GRASP_KNAPSACK, GRASP_TSP]
 # problems = [GRASP_KNAPSACK]
 distributions = [step_uniform, triangular]
-alpha_vals = [0.0, 0.5, 1.0]
+alpha_vals = [0.0, 0.1, 0.5, 0.9, 1.0]
 # alpha_vals = [1.0]
 solvers = ["RS", "HC", "EA"]
 # solvers = ["HC"]
-str_trace_vals = [False, True]
+str_trace_vals = [True]
 patch_vals = [False] # cp ../tracer/wrapper_nopatch.py ../tracer/wrapper.py
 patch_vals = [True]  # cp ../tracer/wrapper_patch.py ../tracer/wrapper.py
 budget = 5
