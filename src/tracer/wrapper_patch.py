@@ -12,10 +12,13 @@ def compatible_type(curr_type, trace_type, trace_val):
     
     if curr_type == trace_type:
         return True
-        
-    if curr_type[0] == trace_type[0] and trace_val in curr_type[1][0]:
-        print('*', end='')
-        return True
+    
+    try:
+        if curr_type[0] == trace_type[0] and trace_val in curr_type[1][0]:
+            print('*', end='')
+            return True
+    except:
+        return False
         
     return False
 
