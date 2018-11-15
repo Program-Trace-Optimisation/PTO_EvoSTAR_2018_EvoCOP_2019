@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-import numpy as np
-
 """Late-acceptance hill-climbing as proposed in
 http://www.yuribykov.com/LAHC/LAHC-TR.pdf
 
@@ -64,7 +62,7 @@ Do until a chosen stopping condition
         self.data = [Cs]
         best = s
         Cbest = Cs
-        f = Cs * np.ones(int(self.LFA)+1) # If LFA is large, an array will be more efficient than a list
+        f = [Cs for _ in range int(self.LFA)+1]
         for I in range(self.NUMBER_GENERATION):
             s_ = self.ops.mutate_ind(s)
             Cs_ = self.ops.evaluate_ind(s_)

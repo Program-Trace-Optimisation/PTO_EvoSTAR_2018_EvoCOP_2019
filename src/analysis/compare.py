@@ -5,10 +5,13 @@ from solver import solve
 from functools import partial
 from collections import defaultdict
 
-import numpy as np
-import scipy.stats
-
-import matplotlib.pyplot as plt
+try:
+    import numpy as np
+    import scipy.stats
+    import matplotlib.pyplot as plt
+except:
+    print("Warning: Numpy, Scipy, or Matplotlib cannot be imported, so no analysis available during this run (maybe you are using pypy?)")
+    
 
 from pprint import pprint
 
