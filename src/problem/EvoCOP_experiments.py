@@ -15,7 +15,7 @@ This file is for running experiments for an EvoCOP 2019 submission:
 -several instances of each problem
 -maybe 5 different values of alpha
 -several PTO solvers RS, HC, EA
--PTO with versus without a patch for re-use of valid outputs.
+-PTO with versus without a new improved repair method for better re-use of valid outputs.
 -multiple repetitions
 
 Running this file will do all of the above. Give command-line
@@ -26,6 +26,16 @@ do 30 repetitions with seeds 0 - 29.
 However this file is written to use a tiny budget of fitness
 evaluations, and without writing anything to disk. To use a realistic
 budget and write to disk, uncomment appropriate lines at the bottom.
+
+One further complication is that the new improved repair method is implemented as
+a "patch" for now. To use it, please run:
+
+$ mv ../tracer/wrapper.py ../tracer/wrapper_nopatch.py; mv ../tracer/wrapper_patch.py ../tracer/wrapper.py
+
+(before starting PTO). To revert, execute the following:
+
+$ mv ../tracer/wrapper.py ../tracer/wrapper_patch.py; mv ../tracer/wrapper_nopatch.py ../tracer/wrapper.py
+
 """
 
 
@@ -77,8 +87,8 @@ distributions = [stepuniform]
 alpha_vals = [0.0, 0.1, 0.5, 0.9, 1.0]
 solvers = ["RS", "HC", "EA"]
 str_trace_vals = [True]
-# patch_vals = [False] # cp ../tracer/wrapper_nopatch.py ../tracer/wrapper.py
-patch_vals = [True]  # cp ../tracer/wrapper_patch.py ../tracer/wrapper.py
+# patch_vals = [False] # mv ../tracer/wrapper.py ../tracer/wrapper_patch.py; mv ../tracer/wrapper_nopatch.py ../tracer/wrapper.py
+patch_vals = [True]  # mv ../tracer/wrapper.py ../tracer/wrapper_nopatch.py; mv ../tracer/wrapper_patch.py ../tracer/wrapper.py
 
 budget = 200 # Change to 20,000 for the results as in the paper.
 start_rep, end_rep = int(sys.argv[1]), int(sys.argv[2])
