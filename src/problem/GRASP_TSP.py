@@ -2,7 +2,6 @@ from __future__ import print_function
 
 # numerical stuff
 import math
-import numpy as np
 import itertools
 
 import sys # for CLI
@@ -15,11 +14,11 @@ import os.path
 import gzip
 
 
-# Travelling Salesperson Problem.
-# An intro to the problem and some basic experimentation is
-# available in TSP.ipynb. The experiments in the PPSN paper are in
-# TSP_experiment.py, which calls TSP.py. The results are
-# analysed in TSP_results.ipynb. The EvoCOP paper uses GRASP_TSP.py.
+# Travelling Salesperson Problem in GRASP-like format as used in our
+# EvoCOP paper. Results are analysed in EvoCOP_results.ipynb.
+
+# Note we have another implementation of TSP as used in PPSN 2018, see
+# TSP.py.
 
 
 # Fitness is the
@@ -161,7 +160,7 @@ if not os.path.isfile(os.path.join(TSPLIB_dirname, "att48.tsp.gz")): # example t
     get_TSPLIB(TSPLIB_dirname)
 
 TSPLIB_names = [
-    # just a selection of the ones in node xy-coordinate format
+    # just a selection of the ones in node xy-coordinate format: the ones we used in PTO paper PPSN 2018
     "att48", "berlin52", "eil101", "u159", "a280", "rat575"
     ]
 
@@ -170,4 +169,3 @@ for name in TSPLIB_names:
     inst = TSP(os.path.join(TSPLIB_dirname, name + ".tsp.gz"))
     instances.append({"name": name, "n": len(inst.matrix), "data": inst.matrix})
 
-instances = instances[:1]

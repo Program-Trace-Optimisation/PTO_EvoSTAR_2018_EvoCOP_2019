@@ -1,6 +1,5 @@
 import random
 import os.path
-import numpy as np
 import re
 import io
 
@@ -28,7 +27,10 @@ pattern = name + blank + plusses + desc + size + data + plusses
 
 def convert_problem_data(inst_data):
     # read to numpy from a string
-    data = np.genfromtxt(io.BytesIO(inst_data.encode()), dtype=int)
+    data = []
+    for line in inst_data.split("\n"):
+        line = list(map(int, line.split()))
+        data.append(line)
     problem = []
     # convert each instance to a list of lists of pairs, where each pair
     # gives (machine, time needed)
@@ -41,19 +43,28 @@ def convert_problem_data(inst_data):
         problem.append(job)
     return problem
 
+# There are many instances in the jobshop1.txt file but we take just these 6
+# for EvoCOP experiments.
+instance_names = [
+  "abz5",
+  "abz6",
+  "abz7",
+  "abz8",
+  "abz9",
+  "yn1"
+  ]
 
 instances = []
 
 for inst_name, n, m, inst_data in re.findall(pattern, txt, flags=re.DOTALL):
   #print(inst_name)
-  instances.append({"size": (n, m),
-                    "data": convert_problem_data(inst_data),
-                    "name": inst_name,
-                    "n": n,
-                    "m": m})
+  if inst_name in instance_names:
+    instances.append({"size": (n, m),
+                      "data": convert_problem_data(inst_data),
+                      "name": inst_name,
+                      "n": n,
+                      "m": m})
   
-instances = instances[:1] # FIXME  
-
 
 def fitness(solution): # makespan: maximum of termination times on machines
     # PTO always maximises, but we want small makespan, so use -max

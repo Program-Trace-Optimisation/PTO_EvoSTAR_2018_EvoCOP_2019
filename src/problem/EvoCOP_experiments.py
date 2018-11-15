@@ -2,34 +2,32 @@ from PTO import random, solve, random_function
 
 import GRASP_ORDERING, GRASP_KNAPSACK, GRASP_JSSP, GRASP_TSP
 
-import sys, math, time
+import sys, os, math, time
 
 import random as noise
 
 
 """
 
-This file is for running experiments:
+This file is for running experiments for an EvoCOP 2019 submission:
 
 -several combinatorial optimisation problems
 -several instances of each problem
--a GRASP-in-PTO approach, and a biased randomisation-in-PTO approach
- (both implemented as GRASP with different distributions)
 -maybe 5 different values of alpha
 -several PTO solvers RS, HC, EA
--PTO linear versus structured trace
--PTO with versus without a patch for re-use of valid outputs,
+-PTO with versus without a patch for re-use of valid outputs.
+-multiple repetitions
 
-Biased Randomisation can be seen as a generalisation of the main idea
-of GRASP. Instead of choosing uniformly from the restricted candidate
-list, it can choose from all possible candidates according to any
-distribution. For example, we may use a triangular or exponential
-distribution. See "MIRHA: multi-start biased randomization of
-heuristics with adaptive local search for solving non-smooth routing
-problems" (Juan et al., p. 121).
+Running this file will do all of the above. Give command-line
+arguments specifying the start and stop values for the random seeds
+(thus the number of repetitions), eg ./EvoCOP_experiments.py 0 30 will
+do 30 repetitions with seeds 0 - 29.
 
-
+However this file is written to use a tiny budget of fitness
+evaluations, and without writing anything to disk. To use a realistic
+budget and write to disk, uncomment appropriate lines at the bottom.
 """
+
 
 def GRASP_randsol():
     solution = empty_solution()
@@ -40,46 +38,49 @@ def GRASP_randsol():
         solution = add_feature(solution, selected_feature)
     return solution
 
-def step_uniform(features, costs, solution, alpha):
-    # This implements the RCL as used in GRASP
-    # which is a step-uniform distribution
+def stepuniform(features, costs, solution, alpha):
+    # This implements the RCL as used in GRASP, which is a
+    # step-uniform distribution In this version, alpha gives a
+    # threshold on cost. This is the only type used in the EvoCOP
+    # paper.
     min_cost, max_cost = min(costs.values()), max(costs.values())
     RCL = [feat for feat in features if costs[feat] <= min_cost + alpha * (max_cost - min_cost)]
     return random.choice(RCL)
 
-def triangular(features, costs, solution, alpha):
-    # a triangular distribution: pdf has a peak at 0 and scales linearly to 0 at alpha * n
+def stepuniformrank(features, costs, solution, alpha):
+    # This implements the RCL as used in GRASP which is a step-uniform
+    # distribution In this version, alpha gives a threshold on ranked
+    # cost.
+    features.sort(key=lambda feature: costs[feature], reverse=True) # FIXME I considered quick-select but didn't find it clearly faster for typical workload, but this could be revisited.
+    threshold = int(alpha * len(features))
+    idx = random.randrange(threshold) # FIXME does this method preserve the trace?
+    return features[idx]
+
+def triangularrank(features, costs, solution, alpha):
+    # This implements a triangular distribution as in some Juan et al
+    # work. The pdf has a peak at 0 and scales linearly to 0 at alpha
+    # * n
     n = len(features)
+    # FIXME does this method preserve the trace correctly?
     r = random.triangular(0, alpha * n, 0) # LB, UB, mode
     idx = int(r)
     if idx >= n: # very rare, the equivalent of sampling 1.0 from a uniform on [0.0, 1.0]
         idx -= 1   # it would choose an invalid feature, so we hack it.
-    features.sort(key=lambda feature: costs[feature], reverse=True) # FIXME consider quick-select
+    features.sort(key=lambda feature: costs[feature], reverse=True) # FIXME see above re quick-select
     return features[idx]
 
-# @random_function
-# def choose_from_Boltzmann(features, costs, solution, alpha):
-#     # a Boltzmann distribution: alpha controls how "peaked" the distribution is near 0
-#     n = len(features)
-#     minp, maxp = -2, 1
-#     lambda_ = 10**(maxp - alpha * (maxp - minp)) / math.log10(n + 1)
-#     idx = boltzmann.rvs(lambda_, n, size=1)[0] # FIXME would need to trace this
-#     features.sort(key=lambda feature: costs[feature], reverse=True) # FIXME consider quick-select
-#     return features[idx]
-
     
-
+dirname = "EvoCOP_results"
+os.makedirs(dirname, exist_ok=True)
 problems = [GRASP_ORDERING, GRASP_JSSP, GRASP_KNAPSACK, GRASP_TSP]
-# problems = [GRASP_KNAPSACK]
-distributions = [step_uniform, triangular]
+distributions = [stepuniform]
 alpha_vals = [0.0, 0.1, 0.5, 0.9, 1.0]
-# alpha_vals = [1.0]
 solvers = ["RS", "HC", "EA"]
-# solvers = ["HC"]
 str_trace_vals = [True]
-patch_vals = [False] # cp ../tracer/wrapper_nopatch.py ../tracer/wrapper.py
+# patch_vals = [False] # cp ../tracer/wrapper_nopatch.py ../tracer/wrapper.py
 patch_vals = [True]  # cp ../tracer/wrapper_patch.py ../tracer/wrapper.py
-budget = 5
+
+budget = 200 # Change to 20,000 for the results as in the paper.
 start_rep, end_rep = int(sys.argv[1]), int(sys.argv[2])
 
 for problem in problems:
@@ -105,9 +106,24 @@ for problem in problems:
                             for rep in range(start_rep, end_rep):
                                 random.seed(rep)
                                 noise.seed(rep)
+                                fname = "_".join(map(str, [problem.__name__, instance["name"], instance["n"], choose_feature.__name__, alpha, solver, patch, str_trace, budget, rep]))
+                                full_fname = dirname + "/" + fname + ".dat"
+
+                                # if running in a multi-core
+                                # environment with stopping and
+                                # restarting of the script, this line
+                                # helps avoid re-running setups
+                                # already finished.
+                                if os.path.exists(full_fname):
+                                    continue
+
+                                # do the run! (and time it)
                                 start_time = time.time()
-                                print(problem.__name__, instance["name"], instance["n"], choose_feature.__name__, alpha, solver, patch, str_trace, rep)
                                 ind, fit = solve(GRASP_randsol, fitness, solver=solver, str_trace=str_trace, budget=budget)
                                 end_time = time.time()
                                 elapsed_time = end_time - start_time
-                                print(problem.__name__, instance["name"], instance["n"], choose_feature.__name__, alpha, solver, patch, str_trace, rep, start_time, elapsed_time, fit, str(ind))
+                                
+                                output = "\t".join(map(str, [problem.__name__, instance["name"], instance["n"], choose_feature.__name__, alpha, solver, patch, str_trace, budget, rep, start_time, elapsed_time, fit, str(ind)]))
+                                print(output)
+                                # uncomment this line to write to disk.
+                                # open(full_fname, "w").write(output + "\n")

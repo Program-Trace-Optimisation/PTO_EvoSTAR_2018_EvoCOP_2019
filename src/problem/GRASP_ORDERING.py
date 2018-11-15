@@ -27,12 +27,15 @@ def add_feature(solution, feat):
 
 
 instances = [
-    {"name": "ordering-10",
-     "n": 10}
+    {"name": "ordering-10", "n": 10},
+    {"name": "ordering-20", "n": 20},
+    {"name": "ordering-40", "n": 40},
+    {"name": "ordering-80", "n": 80},
+    {"name": "ordering-160", "n": 160},
+    {"name": "ordering-320", "n": 320},
 ]
 
 
 def random_instance(n):
-    return {"name": "ordering-%d" % n,
-          "n": n}
+    return {"name": "ordering-%d" % n, "n": n}
   
