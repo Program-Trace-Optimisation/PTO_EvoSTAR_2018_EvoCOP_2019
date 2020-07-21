@@ -19,7 +19,7 @@ problems = [
 gram_file = "sr.bnf"
 
 nreps = 30
-methods = ["RS", "HC", "LA", "EA"]
+methods = ["RS", "HC", "LA", "EA", "MGA"]
 str_traces = [False, True]
 randsols = ["GE_randsol_sr_nobnf"]
 budget = 20000

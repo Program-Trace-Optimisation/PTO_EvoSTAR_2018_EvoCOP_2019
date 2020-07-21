@@ -62,7 +62,7 @@ Do until a chosen stopping condition
         self.data = [Cs]
         best = s
         Cbest = Cs
-        f = [Cs for _ in range int(self.LFA)+1]
+        f = [Cs for _ in range(int(self.LFA)+1)]
         for I in range(self.NUMBER_GENERATION):
             s_ = self.ops.mutate_ind(s)
             Cs_ = self.ops.evaluate_ind(s_)

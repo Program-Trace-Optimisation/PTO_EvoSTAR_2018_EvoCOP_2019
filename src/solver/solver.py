@@ -14,7 +14,8 @@ solver_name = {
 	"HC" : "ALG_HC_hill_climber",
 	"LA" : "ALG_LAHC_late_acceptance",
 	"EA" : "ALG_EA_evolutionary_algorithm",
-	"PS" : "ALG_PS_particle_swarm"
+	"PS" : "ALG_PS_particle_swarm",
+	"MGA": "ALG_MGA_microbial_genetic_algorithm"
 }
 
 
@@ -68,7 +69,7 @@ def solve(randsol, fitness, solver=None, budget=None, effort=1.5, fine_ops=True,
 	else:
 	
 		print("solver %s not available!" % solver)
-		print("solver = RS | HC | LA | EA | PS")
+		print("solver = RS | HC | LA | EA | PS | MGA")
   
     
 ################################################################################

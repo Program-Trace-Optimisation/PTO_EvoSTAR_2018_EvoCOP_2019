@@ -106,7 +106,6 @@ def roulette_wheel(items, wts): # assumes wts sum to 1
     print("Error")
     print(items)
     print(wts)
-    print(r)
     raise ValueError
 
 
@@ -158,7 +157,7 @@ class TSP:
         # self.read_optimal_results("TSPLIB/STSP.html")
 
     def euclidean_distance(self, x, y):
-        return math.sqrt(sum((xi - yi) ** 2.0 for xi, yi in zip(x, y)))
+        return sqrt(sum((xi - yi) ** 2.0 for xi, yi in zip(x, y)))
 
     def read_optimal_results(self, filename):
         # If we would like to look at known optima for these problem see
@@ -243,4 +242,5 @@ item = (inst_filename, search_algo, randsol.__name__, str_trace, budget, seed, o
 ofilename = "%s_%s_%s_%d_%d_%d.dat" % (inst_filename, search_algo, randsol.__name__, str_trace, budget, seed)
 ofilename = ofilename.replace("/", "_") # in case user has passed in a dirname
 ofilename = os.path.join("TSP_results", ofilename)
-file(ofilename, "w").write("%s\t%s\t%s\t%d\t%d\t%d\t%f\t%s\n" % item)
+with open(ofilename, 'w') as outputFile:
+    outputFile.write("%s\t%s\t%s\t%d\t%d\t%d\t%f\t%s\n" % item)

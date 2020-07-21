@@ -34,19 +34,19 @@ print("R :", (rs, fitness(rs)))
 
 ##### 3) optimize it!
 
-for method in ["RS", "HC", "LA", "EA", "PS"]:
+for method in ["RS", "HC", "LA", "EA", "PS", "MGA"]:
     for trace_type in [False, True]:
         print(method, trace_type)
         print(solve(randsol1, fitness, solver = method, str_trace = trace_type, fine_ops=True, effort = 2))
 
 
 
-##### 4) ... and analize it
+##### 4) ... and analyze it
 
 
 # methods
 
-# print(compare_methods(randsol, fitness, num_runs=10, term=2))
+print(compare_methods(randsol1, fitness, num_runs=10, term=2))
 # min, avg fitness of 10 runs of RS, HC, EA, PS
 
 

@@ -2,7 +2,7 @@ from __future__ import print_function
 
 from solver import solve
 
-from functools import partial
+from functools import partial, reduce
 from collections import defaultdict
 
 try:
@@ -24,7 +24,7 @@ def stat_summary(x):
 # problem.
 def compare_methods(solgen, fitness, term=2, num_runs=10, init=None):
     data = []
-    for met in ["RS", "HC", "LA", "EA", "PS"]:
+    for met in ["RS", "HC", "LA", "EA", "PS", "MGA"]:
         fits = []
         for _ in range(num_runs):
             if init != None: init()
@@ -143,7 +143,7 @@ def plot_scalability(results):
 
 # Carry out some runs and plot results (objective versus iterations)
 def plot_runs(randsol, fitness, methods=None, budget=1000, num_runs=5):
-    if methods is None: methods = ["RS", "HC", "LA", "EA", "PS"]
+    if methods is None: methods = ["RS", "HC", "LA", "EA", "PS", "MGA"]
 
     for method in methods:
         results = []
@@ -183,7 +183,7 @@ def compare_scalability(rsol, fit, min_size, max_size, num_runs=10, term=2):
     for size in range(min_size, max_size):
         print(".", end="")
         data[size] = compare_methods(partial(rsol, problem_size=size), partial(fit, problem_size=size), num_runs=num_runs, term=term)
-    for method in ["RS", "HC", "EA", "PS"]:
+    for method in ["RS", "HC", "EA", "PS", "MGA"]:
         plt.plot([data[size][method][2] for size in range(min_size,max_size)])
     plt.legend(["RS", "HC", "EA", "PS"], loc='lower right')
     plt.title("solution quality vs problem size")
